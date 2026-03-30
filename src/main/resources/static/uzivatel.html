@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Kadeřnictví - Seznam zákazníků</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 50%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+
+<h1>Registrovaní zákazníci</h1>
+<a href="index.html">Zpět na přidání zákazníka</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Jméno</th>
+        <th>Telefon</th>
+        <th>E-mail</th>
+    </tr>
+    </thead>
+    <tbody id="tabulkaZakazniku">
+    </tbody>
+</table>
+
+<script>
+    // Funkce se spustí hned po načtení stránky
+    window.onload = function() {
+        nactiZakazniky();
+    };
+
+    function nactiZakazniky() {
+        // Zeptáme se backendu na data
+        fetch('http://localhost:8080/users')
+            .then(response => response.json()) // Tvůj controller vrací List (v JS to je pole JSONů)
+            .then(data => {
+                const tabulka = document.getElementById('tabulkaZakazniku');
+                tabulka.innerHTML = ''; // Vyčistíme předchozí data
+
+                // Projdeme každého zákazníka a vytvoříme řádek v tabulce
+                data.forEach(zakaznik => {
+                    const radek = `
+                        <tr>
+                            <td>${zakaznik.id}</td>
+                            <td>${zakaznik.jmeno}</td>
+                            <td>${zakaznik.tel}</td>
+                            <td>${zakaznik.email}</td>
+                        </tr>
+                    `;
+                    tabulka.innerHTML += radek;
+                });
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                document.getElementById('tabulkaZakazniku').innerHTML = "<tr><td colspan='4'>Nelze načíst data ze serveru. Běží backend?</td></tr>";
+            });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Nové Kadeřnictví - Přidat zákazníka</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        input { padding: 8px; width: 250px; }
+        button { padding: 10px 15px; background: #28a745; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h1>Přidat nového zákazníka</h1>
+
+<div class="form-group">
+    <label>Jméno a příjmení:</label><br>
+    <input type="text" id="jmenoInput" placeholder="Např. Jan Novák">
+</div>
+<div class="form-group">
+    <label>Telefon:</label><br>
+    <input type="text" id="telInput" placeholder="Např. 777 123 456">
+</div>
+<div class="form-group">
+    <label>E-mail:</label><br>
+    <input type="email" id="emailInput" placeholder="jan@novak.cz">
+</div>
+
+<button onclick="ulozitZakaznika()">Uložit zákazníka</button>
+
+<p id="vysledekZprava" style="color: blue; font-weight: bold;"></p>
+
+<br><a href="uzivatel.html">Přejít na výpis všech zákazníků</a>
+
+<script>
+    function ulozitZakaznika() {
+        // 1. Získáme hodnoty z políček
+        const jmeno = document.getElementById('jmenoInput').value;
+        const tel = document.getElementById('telInput').value;
+        const email = document.getElementById('emailInput').value;
+
+        // 2. Vytvoříme objekt, který odpovídá tvé Java Entitě Zakaznik
+        const novyZakaznik = {
+            jmeno: jmeno,
+            tel: tel,
+            email: email
+        };
+
+        // 3. Pošleme to na tvůj Spring Boot backend
+        fetch('http://localhost:8080/users/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(novyZakaznik)
+        })
+            .then(response => response.text()) // Tvůj controller vrací String (text)
+            .then(data => {
+                document.getElementById('vysledekZprava').innerText = data; // Vypíše zprávu od serveru
+                // Vyčistíme formulář
+                document.getElementById('jmenoInput').value = '';
+                document.getElementById('telInput').value = '';
+                document.getElementById('emailInput').value = '';
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                document.getElementById('vysledekZprava').innerText = "Chyba při ukládání na server!";
+            });
+    }
+</script>
+</body>
+</html>

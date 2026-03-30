@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Kadeřnictví - Přidat službu</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        input { padding: 8px; width: 250px; }
+        button { padding: 10px 15px; background: #ff9800; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<h1>Přidat novou službu do ceníku</h1>
+
+<div class="form-group">
+    <label>Druh střihu / Název služby:</label><br>
+    <input type="text" id="druhStrihuInput" placeholder="Např. Pánský střih strojkem">
+</div>
+<div class="form-group">
+    <label>Cena (Kč):</label><br>
+    <input type="number" id="cenaInput" placeholder="Např. 350">
+</div>
+
+<button onclick="ulozitSluzbu()">Uložit službu</button>
+
+<p id="vysledekZprava" style="color: blue; font-weight: bold;"></p>
+
+<br><a href="sluzby.html">Přejít na výpis všech služeb</a>
+<br><a href="index.html">Zpět na úvod (Zákazníci)</a>
+
+<script>
+    function ulozitSluzbu() {
+        const druhStrihu = document.getElementById('druhStrihuInput').value;
+        const cena = document.getElementById('cenaInput').value;
+
+        // Objekt přesně kopíruje atributy tvé Java entity Sluzba
+        const novaSluzba = {
+            druhStrihu: druhStrihu,
+            cena: cena
+        };
+
+        // Voláme tvůj nový SluzbaController
+        fetch('http://localhost:8080/sluzby/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(novaSluzba)
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('vysledekZprava').innerText = data;
+                document.getElementById('druhStrihuInput').value = '';
+                document.getElementById('cenaInput').value = '';
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                document.getElementById('vysledekZprava').innerText = "Chyba při ukládání na server!";
+            });
+    }
+</script>
+</body>
+</html>

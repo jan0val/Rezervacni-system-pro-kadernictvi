@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Kadeřnictví - Seznam personálu</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 50%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+
+<h1>Náš tým kadeřníků</h1>
+<a href="pridat_kadernika.html">Zpět na přidání kadeřníka</a>
+<br><br>
+<a href="uzivatel.html">Zobrazit zákazníky</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Jméno</th>
+        <th>Příjmení</th>
+    </tr>
+    </thead>
+    <tbody id="tabulkaKaderniku">
+    </tbody>
+</table>
+
+<script>
+    window.onload = function() {
+        nactiKaderniky();
+    };
+
+    function nactiKaderniky() {
+        // Získáváme data z tvého nového endpointu
+        fetch('http://localhost:8080/kadernici')
+            .then(response => response.json())
+            .then(data => {
+                const tabulka = document.getElementById('tabulkaKaderniku');
+                tabulka.innerHTML = '';
+
+                data.forEach(kadernik => {
+                    const radek = `
+                        <tr>
+                            <td>${kadernik.id}</td>
+                            <td>${kadernik.jmeno}</td>
+                            <td>${kadernik.prijmeni}</td>
+                        </tr>
+                    `;
+                    tabulka.innerHTML += radek;
+                });
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                document.getElementById('tabulkaKaderniku').innerHTML = "<tr><td colspan='3'>Nelze načíst data ze serveru. Běží backend?</td></tr>";
+            });
+    }
+</script>
+</body>
+</html>

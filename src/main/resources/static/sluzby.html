@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Kadeřnictví - Ceník služeb</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 50%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+
+<h1>Ceník našich služeb</h1>
+<a href="pridat_sluzbu.html">Zpět na přidání služby</a>
+<br><br>
+<a href="index.html">Zpět na úvod</a>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Druh střihu</th>
+        <th>Cena (Kč)</th>
+    </tr>
+    </thead>
+    <tbody id="tabulkaSluzeb">
+    </tbody>
+</table>
+
+<script>
+    window.onload = function() {
+        nactiSluzby();
+    };
+
+    function nactiSluzby() {
+        fetch('http://localhost:8080/sluzby')
+            .then(response => response.json())
+            .then(data => {
+                const tabulka = document.getElementById('tabulkaSluzeb');
+                tabulka.innerHTML = '';
+
+                data.forEach(sluzba => {
+                    const radek = `
+                        <tr>
+                            <td>${sluzba.id}</td>
+                            <td>${sluzba.druhStrihu}</td>
+                            <td>${sluzba.cena} Kč</td>
+                        </tr>
+                    `;
+                    tabulka.innerHTML += radek;
+                });
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                document.getElementById('tabulkaSluzeb').innerHTML = "<tr><td colspan='3'>Nelze načíst data ze serveru. Běží backend?</td></tr>";
+            });
+    }
+</script>
+</body>
+</html>
