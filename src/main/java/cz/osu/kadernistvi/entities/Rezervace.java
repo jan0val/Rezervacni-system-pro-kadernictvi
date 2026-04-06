@@ -12,7 +12,12 @@ public class Rezervace {
     @Column(name = "ID_rezervace")
     private Long id;
 
-    private LocalDateTime datum;
+    @Column(name = "cas_zacatku")
+    private LocalDateTime casZacatku;
+
+    @Column(name = "cas_konce")
+    private LocalDateTime casKonce;
+
     private String status;
 
     @ManyToOne
@@ -39,12 +44,20 @@ public class Rezervace {
         this.id = id;
     }
 
-    public LocalDateTime getDatum() {
-        return datum;
+    public LocalDateTime getCasZacatku() {
+        return casZacatku;
     }
 
-    public void setDatum(LocalDateTime datum) {
-        this.datum = datum;
+    public void setCasZacatku(LocalDateTime casZacatku) {
+        this.casZacatku = casZacatku;
+    }
+
+    public LocalDateTime getCasKonce() {
+        return casKonce;
+    }
+
+    public void setCasKonce(LocalDateTime casKonce) {
+        this.casKonce = casKonce;
     }
 
     public String getStatus() {

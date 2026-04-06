@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <title>Kadeřnictví - Nová rezervace</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        select, input { padding: 8px; width: 300px; }
+        button { padding: 10px 15px; background: #dc3545; color: white; border: none; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1>Vytvořit novou rezervaci</h1>
+
+<div class="form-group">
+    <label>Vyberte zákazníka:</label><br>
+    <select id="zakaznikSelect">
+        <option value="">-- Načítám zákazníky... --</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Vyberte kadeřníka:</label><br>
+    <select id="kadernikSelect">
+        <option value="">-- Načítám kadeřníky... --</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Vyberte službu:</label><br>
+    <select id="sluzbaSelect">
+        <option value="">-- Načítám ceník... --</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Datum a čas začátku:</label><br>
+    <input type="datetime-local" id="casInput">
+</div>
+
+<button onclick="ulozitRezervaci()">Uložit rezervaci</button>
+
+<p id="vysledekZprava" style="color: blue; font-weight: bold;"></p>
+
+<br><br>
+<a href="index.html">Zpět na úvodní stránku</a>
+
+<script>
+    // Hned po načtení stránky stáhneme data pro všechny 3 roletky
+    window.onload = function() {
+        nactiZakazniky();
+        nactiKaderniky();
+        nactiSluzby();
+    };
+
+    function nactiZakazniky() {
+        fetch('http://localhost:8080/users')
+            .then(res => res.json())
+            .then(data => {
+                let select = document.getElementById('zakaznikSelect');
+                select.innerHTML = '<option value="">-- Vyberte zákazníka --</option>';
+                data.forEach(z => {
+                    // Do 'value' schováme ID, uživateli ukážeme jméno a telefon
+                    select.innerHTML += `<option value="${z.id}">${z.jmeno} (${z.tel})</option>`;
+                });
+            });
+    }
+
+    function nactiKaderniky() {
+        fetch('http://localhost:8080/kadernici')
+            .then(res => res.json())
+            .then(data => {
+                let select = document.getElementById('kadernikSelect');
+                select.innerHTML = '<option value="">-- Vyberte kadeřníka --</option>';
+                data.forEach(k => {
+                    select.innerHTML += `<option value="${k.id}">${k.jmeno} ${k.prijmeni}</option>`;
+                });
+            });
+    }
+
+    function nactiSluzby() {
+        fetch('http://localhost:8080/sluzby')
+            .then(res => res.json())
+            .then(data => {
+                let select = document.getElementById('sluzbaSelect');
+                select.innerHTML = '<option value="">-- Vyberte službu --</option>';
+                data.forEach(s => {
+                    select.innerHTML += `<option value="${s.id}">${s.druhStrihu} - ${s.cena} Kč</option>`;
+                });
+            });
+    }
+
+    function ulozitRezervaci() {
+        // Získáme vybraná ID z roletek a čas z inputu
+        const zakaznikId = document.getElementById('zakaznikSelect').value;
+        const kadernikId = document.getElementById('kadernikSelect').value;
+        const sluzbaId = document.getElementById('sluzbaSelect').value;
+        const casZacatku = document.getElementById('casInput').value;
+
+        // Jednoduchá kontrola, jestli uživatel něco nezapomněl vyplnit
+        if(!zakaznikId || !kadernikId || !sluzbaId || !casZacatku) {
+            alert("Prosím vyberte všechny položky a zadejte čas!");
+            return;
+        }
+
+        // Toto přesně odpovídá tvému RezervaceDTO v Javě!
+        const novaRezervace = {
+            zakaznikId: zakaznikId,
+            kadernikId: kadernikId,
+            sluzbaId: sluzbaId,
+            casZacatku: casZacatku
+        };
+
+        // Pošleme to na nový endpoint
+        fetch('http://localhost:8080/rezervace/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(novaRezervace)
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('vysledekZprava').innerText = data;
+                // Vymažeme čas, ať můžeme zadat další
+                document.getElementById('casInput').value = '';
+            })
+            .catch(error => {
+                console.error('Chyba:', error);
+                document.getElementById('vysledekZprava').innerText = "Chyba při ukládání na server!";
+            });
+    }
+</script>
+</body>
+</html>

@@ -16,6 +16,9 @@ public class Sluzba {
 
     private Double cena;
 
+    @Column(name = "delka_v_minutach")
+    private Integer delkaVMinutach;
+
     @ManyToMany(mappedBy = "sluzby")
     private List<Rezervace> rezervace;
 
@@ -41,6 +44,14 @@ public class Sluzba {
 
     public void setCena(Double cena) {
         this.cena = cena;
+    }
+
+    public Integer getDelkaVMinutach() {
+        return delkaVMinutach;
+    }
+
+    public void setDelkaVMinutach(Integer delkaVMinutach) {
+        this.delkaVMinutach = delkaVMinutach;
     }
 
     public List<Rezervace> getRezervace() {
